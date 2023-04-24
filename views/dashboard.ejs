@@ -17,7 +17,63 @@
     <div class="card-body">
         <h2 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Your Assessment</h2>
         <hr>
-        <%if(false){%>
+        <%if(assessments.length > 0){let i = 0;%>
+            <%if(assessments[i].status == 1){%><h3>Active Assessments</h3><%}%>
+            <%for(i = 0; i < assessments.length; i++){if(assessments[i].status == 0) break;%>
+            <div class="card w-100">
+                <div class="card-body">
+                <div class="row">
+                <div class="col-6 d-flex">
+                    <h4><%=i+1%>.</h4>
+                    <div style="margin-left:10px;" class="vr"></div>
+                    <div style="margin-left:10px;">
+                        <h4><%=assessments[i].name%></h4>
+                        <h5 class="text-muted"><%=assessments[i].description%></h5>
+                    </div>
+                </div>
+                <div class="col-6 d-flex align-items-center justify-content-end"><div>
+                    <form method="POST">
+                        <input type="hidden" name="changeStatus">
+                        <input type="hidden" name="status" value="0">
+                        <input type="hidden" name="hash" value="<%=assessments[i].hash%>">
+                        <button class="btn btn-danger" type="submit"><i class="fa-regular fa-circle-stop"></i> Stop Assessment</button>
+                    </form>  <br>
+                    <button class="btn btn-warning"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
+                </div>
+                </div>
+                </div>
+                </div>
+            </div><br>
+            <%}%>
+            <%if(i != 0){%><br><%}%>
+            <%if(i < assessments.length && assessments[i].status == 0){%><h3>InActive Assessments</h3><%}%>
+            <%for(i ; i < assessments.length; i++){%>
+                <div class="card w-100">
+                    <div class="card-body">
+                    <div class="row">
+                    <div class="col-6 d-flex">
+                        <h4><%=i+1%>.</h4>
+                        <div style="margin-left:10px;" class="vr"></div>
+                        <div style="margin-left:10px;">
+                            <h4><%=assessments[i].name%></h4>
+                            <h5 class="text-muted"><%=assessments[i].description%></h5>
+                        </div>
+                    </div>
+                    <div class="col-6 d-flex align-items-center justify-content-end"><div>
+                        <form method="POST">
+                            <input type="hidden" name="changeStatus">
+                            <input type="hidden" name="status" value="1">
+                            <input type="hidden" name="hash" value="<%=assessments[i].hash%>">
+                            <button class="btn btn-success" type="submit"><i class="fa-regular fa-circle-play"></i> Start Assessment</button>
+                        </form> <br>
+                        <button class="btn btn-warning"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                </div><br>
+            <%}%>
+
         <%}else{%>
             <div class="d-flex justify-content-center">
             <img src="./images/dashboard1.jpg" style="width:75%"/>
