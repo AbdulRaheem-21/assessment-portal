@@ -100,7 +100,7 @@
 var totalQuestions = 0;
 $("#addQuestion").on('click',()=>{
     totalQuestions++;
-    var question = $('<div class="card m-2" id="question'+totalQuestions+'"><div class="card-body"><div class="row"><div class="col-1"><h1 id="hquestion'+totalQuestions+'">'+totalQuestions+'.</h1></div><div class="col"><input id="vquestion" placeholder="your question here" style="width:100%;"/><br><br><ul><li class="m-2"><input id="answer1" style="width:70%"/></li><li class="m-2"><input id="answer2" style="width:70%"/></li><li class="m-2"><input id="answer3" style="width:70%"/></li><li class="m-2"><input id="answer4" style="width:70%"/></li></ul><hr><button id="dquestion'+totalQuestions+'" class="btn btn-danger btn-sm" onclick="deleteQuestion('+totalQuestions+')">Delete This Question</button></div></div></div></div>')
+    var question = $('<div class="card m-2" id="question'+totalQuestions+'"><div class="card-body"><div class="row"><div class="col-1"><h1 id="hquestion'+totalQuestions+'">'+totalQuestions+'.</h1></div><div class="col"><input id="vquestion" placeholder="your question here" style="width:100%;"/><br><br><ul><li class="m-2"><input id="answer1" style="width:70%"/></li><li class="m-2"><input id="answer2" style="width:70%"/></li><li class="m-2"><input id="answer3" style="width:70%"/></li><li class="m-2"><input id="answer4" style="width:70%"/></li></ul><hr><button id="dquestion'+totalQuestions+'" class="btn btn-danger btn-sm" onclick="deleteQuestion('+totalQuestions+')">Delete This Question</button><div class="vr"></div>Correct Answer:<select id="correctanswer"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div></div></div></div>')
     $("#questions").append(question);
 
     $("#isempty").attr('style','width:0%;height:0%;')
@@ -132,7 +132,7 @@ $("#publishQuestion").on('click',()=>{
             $(`#question${i}`).find('#answer3').val(),
             $(`#question${i}`).find('#answer4').val()
         ];
-        Question.correct = 0;
+        Question.correct = $(`#question${i}`).find("#correctanswer").find(":selected").val();
         Questions.push(Question);
     }
 
