@@ -18,14 +18,26 @@
         <div class="card-body" style="width:100%;height:600px;">
             <div class="w-100 h-100">
             <div style="height:85%">
-                <h1 class="card-title"><%=assessment.name%><%console.log(assessment)%></h1>
+                <h1 class="card-title"><%=assessment.name%></h1>
                 <h3 class="text-muted"><%=assessment.description%></h3>
+                <%if(submission.length > 0){%>
+                    <br>
+                    <hr>
+                    <br>
+                    <div class="card text-bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">You Have Completed Your Assessment</h5>
+                    </div>
+                    </div>
+                <%}%>
             </div>
             <div class="w-100" style="height:15%">
                 <hr>
                 <div class="d-flex align-items-center justify-content-end">
                     <%if(user_info == undefined){%>
                     <button class="btn btn-lg btn-secondary" disabled><i class="fa-solid fa-lock"></i> Login To Continue</button>
+                    <%}else if(submission.length>0){%>
+                    <button class="btn btn-lg btn-secondary" disabled><i class="fa-solid fa-lock"></i> Completed</button>
                     <%}else{%>
                     <form method="post">
                         <button name="send-next" type="submit" class="btn btn-lg btn-success"><i class="fa-solid fa-pen-nib"></i> Start Assessment </button>

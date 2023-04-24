@@ -20,34 +20,112 @@ app.set("view engine","ejs");
  * EXAM MODE -----------------------------------------------------
  */
 app.get("/a/:id",(req,res)=>{
-    connection.query("SELECT * FROM `assessments` WHERE `hash`='"+req.params.id+"'",(err,result)=>{
+    connection.query("SELECT * FROM `assessments` WHERE `hash`='"+req.params.id+"' AND `status`='1'",(err,result)=>{
         if(err) throw err;
 
-        if(result.length > 0) res.render("assessment_view",{client_id:process.env.CLIENT_ID,assessment:result[0],user_info:cookie.get(req.socket.remoteAddress)});
-        else res.sendStatus(404);
+        if(cookie.get(req.socket.remoteAddress)){
+        connection.query("SELECT * FROM `submission` WHERE `assessment`='"+req.params.id+"' AND `mail`='"+cookie.get(req.socket.remoteAddress).email+"'",(err,submission)=>{
+            if(result.length > 0) res.render("assessment_view",{client_id:process.env.CLIENT_ID,submission,assessment:result[0],user_info:cookie.get(req.socket.remoteAddress)});
+            else res.sendStatus(404);
+        });
+        }else{
+            if(result.length > 0) res.render("assessment_view",{client_id:process.env.CLIENT_ID,submission:[],assessment:result[0],user_info:cookie.get(req.socket.remoteAddress)});
+            else res.sendStatus(404);
+        }
         
     });
     
 });
 
 app.post("/a/:id",(req,res)=>{
-
     if("send-next" in req.body){
         if(!cookie.get(req.socket.remoteAddress)){
             res.sendStatus(403);
             return;
         }
-        
-        res.redirect(`../b/${req.params.id}`);
+
+        connection.query("INSERT INTO `submission`( `mail`, `assessment`, `start_datetime`, `status`) VALUES ('"+cookie.get(req.socket.remoteAddress).email+"','"+req.params.id+"','"+(new Date().toISOString().slice(0, 19).replace('T', ' '))+"','1')",(err,result)=>{
+            res.redirect(`../b/${req.params.id}/0`);
+        });
         return;
     }
 
     let user = jsonwebtoken.decode(req.body["credential"]);
-    
     cookie.set(req.socket.remoteAddress,user);
     res.redirect(`../a/${req.params.id}`);
 });
 
+app.get("/b/:id/:page",(req,res)=>{
+    if(!cookie.get(req.socket.remoteAddress)){
+        res.redirect(`../a/${req.params.id}`);
+        return;
+    }
+
+    connection.query("SELECT * FROM `submission` WHERE `mail`='"+cookie.get(req.socket.remoteAddress).email+"' AND `assessment`='"+req.params.id+"' AND `status`='1'",(err,result)=>{
+    if(err) throw err;
+
+    if(result.length <= 0){
+        res.redirect(`../a/${req.params.id}`);
+        return;
+    }
+    
+    connection.query("SELECT * FROM `questions` WHERE `assessment`='"+req.params.id+"'",(err,questions)=>{
+    connection.query("SELECT * FROM `answers` WHERE `assessment`='"+req.params.id+"' AND `owner`='"+cookie.get(req.socket.remoteAddress).email+"' ORDER BY `question`",(err,answers)=>{
+        let completeAnswer = answers.length;
+        for(let i  = 0; i < questions.length; i++){
+            if(i >= answers.length || answers[i].question != i+1){
+                answers.splice(i, 0, undefined);
+            }
+        }
+        console.log(answers);
+    connection.query("SELECT * FROM `assessments` WHERE `hash`='"+req.params.id+"' AND `status`='1'",(err,result)=>{
+        if(err) throw err;
+
+        if(result.length > 0 && req.params.page <= questions.length) res.render("assessment_run",{assessment:result[0],questions,answers,completeAnswer,page:req.params.page,user_info:cookie.get(req.socket.remoteAddress)});
+        else res.sendStatus(404);
+        
+    });
+    });
+    });
+
+    });
+});
+
+app.post("/b/:id/:page",(req,res)=>{
+    if("endAssessment" in req.body){
+        connection.query("UPDATE `submission` SET `status`='0' WHERE `mail`='"+cookie.get(req.socket.remoteAddress).email+"' AND `assessment`='"+req.params.id+"' ",(err,result)=>{
+            if(err) throw err;
+            res.redirect(`../../a/${req.params.id}`);
+        })
+        return;
+    }
+
+    if("answer" in req.body){
+        if(req.body.option == -1){
+            connection.query("DELETE FROM `answers` WHERE `owner`='"+cookie.get(req.socket.remoteAddress).email+"' AND `assessment`='"+req.params.id+"' AND `question`='"+req.params.page+"'",(err,result)=>{
+                if(err) throw err;
+                res.sendStatus(200);
+            })
+            return;
+        }
+        connection.query("SELECT * FROM `answers` WHERE `question`='"+req.params.page+"'",(err,result)=>{
+            if(err) throw err;
+
+            if(result.length > 0){
+                connection.query("UPDATE `answers` SET `answer`='"+req.body.option+"' WHERE `owner`='"+cookie.get(req.socket.remoteAddress).email+"' AND `assessment`='"+req.params.id+"' AND `question`='"+req.params.page+"'",(err,result)=>{
+                    if(err) throw err;
+                    res.sendStatus(200);
+                })
+            }else{
+                connection.query("INSERT INTO `answers`(`owner`, `assessment`, `question`, `answer`) VALUES ('"+cookie.get(req.socket.remoteAddress).email+"','"+req.params.id+"','"+req.params.page+"','"+req.body.option+"')",(err,result)=>{
+                    if(err) throw err;
+                    res.sendStatus(200);
+                })
+            }
+        })
+        return;
+    }
+});
 // ---------------------------------------------------------------
  
 /*
