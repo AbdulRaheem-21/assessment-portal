@@ -16,8 +16,40 @@ app.use(express.static(path.join(__dirname,'public')));
 app.set("view engine","ejs");
 
 
+/*
+ * EXAM MODE -----------------------------------------------------
+ */
+app.get("/a/:id",(req,res)=>{
+    connection.query("SELECT * FROM `assessments` WHERE `hash`='"+req.params.id+"'",(err,result)=>{
+        if(err) throw err;
 
+        if(result.length > 0) res.render("assessment_view",{client_id:process.env.CLIENT_ID,assessment:result[0],user_info:cookie.get(req.socket.remoteAddress)});
+        else res.sendStatus(404);
+        
+    });
+    
+});
 
+app.post("/a/:id",(req,res)=>{
+
+    if("send-next" in req.body){
+        if(!cookie.get(req.socket.remoteAddress)){
+            res.sendStatus(403);
+            return;
+        }
+        
+        res.redirect(`../b/${req.params.id}`);
+        return;
+    }
+
+    let user = jsonwebtoken.decode(req.body["credential"]);
+    
+    cookie.set(req.socket.remoteAddress,user);
+    res.redirect(`../a/${req.params.id}`);
+});
+
+// ---------------------------------------------------------------
+ 
 /*
  * ASSESSMENT ----------------------------------------------------
  */
@@ -65,6 +97,15 @@ app.post("/login",(req,res)=>{
     console.log(user);
     cookie.set(req.socket.remoteAddress,user);
     res.redirect("../");
+});
+
+app.get("/logout",(req,res)=>{
+   cookie.delete(req.socket.remoteAddress,user);
+    res.redirect("../");
+});
+app.get("/logout/:id",(req,res)=>{
+    cookie.delete(req.socket.remoteAddress);
+    res.redirect(`../a/${req.params.id}`);
 });
 // ----------------------------------------------------------------
 
