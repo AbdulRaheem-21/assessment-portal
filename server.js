@@ -13,6 +13,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname,'public')));
 app.set("view engine","ejs");
 
+/*
+ * ASSESSMENT ----------------------------------------------------
+ */
+app.get("/assessment/:id",(req,res)=>{
+    if(!cookie.get(req.socket.remoteAddress)){
+        res.redirect("/login");
+        return;
+    }
+
+    res.render("create",{user_info:cookie.get(req.socket.remoteAddress)});
+});
+
+app.post("/assessment/:id",(req,res)=>{
+    res.sendStatus(200);
+    console.log(req.body);
+});
+
+// ---------------------------------------------------------------
+
 
 /*
  * LOGIN ----------------------------------------------------------
@@ -28,6 +47,15 @@ app.post("/login",(req,res)=>{
 });
 // ----------------------------------------------------------------
 
+app.get("/create",(req,res)=>{
+    if(!cookie.get(req.socket.remoteAddress)){
+        res.redirect("/login");
+        return;
+    }
+
+    let hash = crypto.createHash('md5').update((new Date()).toLocaleString(undefined,{timeZone: 'Asia/Kolkata'})+crypto.randomInt(1000)+"x"+crypto.randomInt(1000)).digest('hex');
+    res.redirect(`../assessment/${hash}`);
+});
 
 app.get("/",(req,res)=>{
     if(!cookie.get(req.socket.remoteAddress)){
