@@ -77,7 +77,6 @@ app.get("/b/:id/:page",(req,res)=>{
                 answers.splice(i, 0, undefined);
             }
         }
-        console.log(answers);
     connection.query("SELECT * FROM `assessments` WHERE `hash`='"+req.params.id+"' AND `status`='1'",(err,result)=>{
         if(err) throw err;
 
@@ -108,7 +107,8 @@ app.post("/b/:id/:page",(req,res)=>{
             })
             return;
         }
-        connection.query("SELECT * FROM `answers` WHERE `question`='"+req.params.page+"'",(err,result)=>{
+        console.log(req.body.option);
+        connection.query("SELECT * FROM `answers` WHERE `question`='"+req.params.page+"' AND `owner`='"+cookie.get(req.socket.remoteAddress).email+"' AND `assessment`='"+req.params.id+"'",(err,result)=>{
             if(err) throw err;
 
             if(result.length > 0){
@@ -178,7 +178,7 @@ app.post("/login",(req,res)=>{
 });
 
 app.get("/logout",(req,res)=>{
-   cookie.delete(req.socket.remoteAddress,user);
+   cookie.delete(req.socket.remoteAddress);
     res.redirect("../");
 });
 app.get("/logout/:id",(req,res)=>{
@@ -213,7 +213,6 @@ app.get("/",(req,res)=>{
     }
     connection.query("SELECT * FROM `assessments` WHERE `owner`='"+cookie.get(req.socket.remoteAddress).email+"' ORDER BY `status` DESC",(err,result)=>{
         if(err) throw err
-        console.log(result);
         res.render("dashboard",{assessments:result,user_info:cookie.get(req.socket.remoteAddress)});
     })
 });

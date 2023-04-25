@@ -37,7 +37,7 @@
                         <input type="hidden" name="status" value="0">
                         <input type="hidden" name="hash" value="<%=assessments[i].hash%>">
                         <button class="btn btn-danger" type="submit"><i class="fa-regular fa-circle-stop"></i> Stop Assessment</button>
-                        <button class="btn btn-warning"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
+                        <button class="btn btn-warning" type="button"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
                         <a class="btn btn-link" target="_blank" href="../a/<%=assessments[i].hash%>">Go To Assessment</a>
                     </form>
                 </div>
@@ -66,7 +66,7 @@
                             <input type="hidden" name="status" value="1">
                             <input type="hidden" name="hash" value="<%=assessments[i].hash%>">
                             <button class="btn btn-success" type="submit"><i class="fa-regular fa-circle-play"></i> Start Assessment</button>
-                            <button class="btn btn-warning"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
+                            <button class="btn btn-warning" type="button"><i class="fa-solid fa-chart-area"></i> View Statistics</button>
                         </form>
                     </div>
                     </div>
@@ -92,8 +92,10 @@
             <img src="<%=user_info.picture%>" class="rounded" style="width:30px;">
             <span style="font-size: large;" class="text-center"><%=user_info.name%></span>
         </div>
-        <div class="col-4 text-end" style="font-size: 20px;color:rgb(186, 107, 107)">
-            <i class="fa-solid fa-power-off"></i>
+        <div class="col-4 text-end">
+            <a class="btn btn-light" href="../logout">
+            <i style="color:rgb(186, 107, 107)" class="fa-solid fa-power-off"></i>
+            </a>
         </div>
         </div>
         </div>

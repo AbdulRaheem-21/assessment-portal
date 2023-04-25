@@ -163,6 +163,7 @@ $('input[type=radio][name=answers]').change(function() {
     $("#loading").attr({'style':'opacity:1;width:100%;margin-left:20px;'});
     $("#savesuccess").attr({'style':'opacity:0;width:0%;margin-left:0px;'});
 
+    console.log(this.value);
     $.post("",{answer:true,option:this.value}, function(data, status){
         $("#loading").attr({'style':'opacity:0;width:0%;margin-left:0px;'});
         $("#savesuccess").attr({'style':'opacity:1;width:100%;margin-left:20px;'});
